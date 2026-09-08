@@ -13,7 +13,12 @@ main()
 	shamuneko_state_t* state = shamuneko_new();
 	assert(state != NULL);
 
-	assert(shamuneko_load_module(state, TESTS_DIR "modules/example1.lua") != NULL);
+	shamuneko_module_t* module =
+		shamuneko_module_load(state, TESTS_DIR "modules/example1.lua");
+
+	shamuneko_module_search(module, "red cat ramen");
+
+	shamuneko_module_destroy(module);
 
 	shamuneko_destroy(state);
 	return 0;

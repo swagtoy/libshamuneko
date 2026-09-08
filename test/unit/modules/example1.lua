@@ -1,12 +1,13 @@
 local mymodule = {
 	name = 'Example module',
-	version = 0
+	version = 0,
 }
 
-function mymodule.thing()
-	print('Hello world')
+function mymodule.search(query)
+	print('user searched "' .. query .. '"')
+	-- return {
+	-- 	{ image='' }
+	-- }
 end
-
-mymodule.thing()
 
 return mymodule
