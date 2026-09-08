@@ -1,3 +1,4 @@
+#include "shamuneko.h"
 #include <lua5.4/lua.h>
 #include <lua5.4/lauxlib.h>
 #include <lua5.4/lualib.h>
@@ -7,6 +8,7 @@
 struct _shamuneko_state
 {
 	lua_State *L;
+	struct shamuneko_http_funcs funcs;
 };
 
 struct _shamuneko_module

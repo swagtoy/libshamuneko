@@ -33,7 +33,7 @@ static void
 _push_mod_table(shamuneko_module_t *module)
 {
 	_MODULE_ST;
-	int table = lua_rawgeti(_L, LUA_REGISTRYINDEX, module->tref);
+	lua_rawgeti(_L, LUA_REGISTRYINDEX, module->tref);
 
 	assert(lua_istable(_L, -1));
 }
