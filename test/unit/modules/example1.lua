@@ -3,12 +3,13 @@ local mymodule = {
 	version = 0,
 }
 local http = httpsession()
-for i=0,10 do
-	httpsession()
-end
 
 function mymodule.search(query)
-	print('user searched "' .. query .. '" ')
+	http.request("https://google.com", function(data)
+		print('user searched "' .. query .. '" and got data: ' .. data)
+		print('Got data: ' .. data)
+	end)
+	--http.request("hi")
 	-- return {
 	-- 	{ image='' }
 	-- }

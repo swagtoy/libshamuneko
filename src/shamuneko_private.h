@@ -1,7 +1,17 @@
+#ifndef _SHAMUNEKO_PRIVATE_H_
+#define _SHAMUNEKO_PRIVATE_H_
+
+#include <assert.h>
 #include "shamuneko.h"
 #include <lua5.4/lua.h>
 #include <lua5.4/lauxlib.h>
 #include <lua5.4/lualib.h>
+
+#ifdef __GNUC__
+#	define SHAMUNEKO_PRIVATE __attribute__((visibility("hidden")))
+#else
+#	define SHAMUNEKO_PRIVATE
+#endif
 
 #define _L (st->L)
 
@@ -19,6 +29,8 @@ struct _shamuneko_module
 	int version;
 };
 
+#define _ASSERT_TOP do { assert(lua_gettop(_L) == 0); } while(0)
+
 // TODO: move this
 #ifndef NDEBUG
 #	define TOP DEBUGF("TOP: %d", (int)lua_gettop(_L))
@@ -33,4 +45,6 @@ struct _shamuneko_module
 #	define DEBUGF(...)
 #	define DEBUG(msg)
 #	define DEBUG_LUA_IF_ERROR(...)
+#endif
+
 #endif

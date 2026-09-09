@@ -1,10 +1,8 @@
-#include <assert.h>
 #include <stdlib.h>
 #include "shamuneko_module.h"
 
 #include "shamuneko_private.h"
 
-#define _ASSERT_TOP do { assert(lua_gettop(_L) == 0); } while(0)
 #define _MODULE_ST shamuneko_state_t *st = module->st
 
 static shamuneko_module_t*

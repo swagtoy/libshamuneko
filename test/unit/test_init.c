@@ -7,9 +7,16 @@
 #	error No TESTS_DIR defined!
 #endif
 
-void _create_session_func()
+void
+_create_session_func()
 {
 	printf("Im creating an http session now.....\n");
+}
+
+void
+_handle_req_func(char *url)
+{
+	printf("The user requested: %s\n", url);
 }
 
 int
@@ -17,6 +24,7 @@ main()
 {
 	shamuneko_state_t* state = shamuneko_new((struct shamuneko_http_funcs){
 		.create_session = _create_session_func,
+		.request = _handle_req_func,
 	});
 	assert(state != NULL);
 
