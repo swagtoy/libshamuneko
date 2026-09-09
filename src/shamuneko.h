@@ -8,8 +8,8 @@ struct _shamuneko_state;
 
 struct shamuneko_http_funcs
 {
-	void (*create_session)();
-	void (*request)(char *url);
+	void* (*create_session)();
+	int (*request)(void *data, char *url);
 };
 #define SHAMUNEKO_HTTP_NOOP ((struct shamuneko_http_funcs){ 0 })
 
