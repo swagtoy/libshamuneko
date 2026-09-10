@@ -12,19 +12,26 @@ void*
 _create_session_func()
 {
 	int *data = malloc(sizeof(int));
-	printf("Im creating an http session now.....\n");
-	*data = 3;
+	printf("CREATING SESSION %p\n", data);
+	*data = rand();
 
 	return data;
 }
 
 int
-_handle_req_func(void *_data, char *url)
+_handle_req_func(void *odata, char const *url, shamuneko_request_t *shamuneko_internal)
 {
-	int *data = _data;
+	int *data = odata;
 	printf("The user requested[%d]: %s\n", *data, url);
 
 	return 0;
+}
+
+void
+_destroy_session_func(void *odata)
+{
+	printf("DESTROYING SESSION %p\n", odata);
+	free(odata);
 }
 
 int
@@ -33,6 +40,7 @@ main()
 	shamuneko_state_t *state = shamuneko_new((struct shamuneko_http_funcs){
 		.create_session = _create_session_func,
 		.request = _handle_req_func,
+		.destroy_session = _destroy_session_func,
 	});
 	assert(state != NULL);
 

@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <lua5.4/lauxlib.h>
 #include "http.h"
 
@@ -6,13 +7,14 @@ _luafunc_httpsession_request(lua_State *L)
 {
 	shamuneko_state_t *st = lua_touserdata(L, lua_upvalueindex(1));
 	void **data = luaL_checkudata(L, 1, "HTTPSession");
+	shamuneko_request_t *req = calloc(1, sizeof(struct _shamuneko_request));
 
-	lua_pushstring(L, "kerfluffle");
-	lua_pcall(L, 1, LUA_MULTRET, 0);
-	char *url = lua_tostring(L, -1);
+	req->st = st;
+	req->callback_ref = luaL_ref(L, LUA_REGISTRYINDEX);
+	char const *url = lua_tostring(L, -1);
 
 	DEBUGF("Request URL: %s", url);
-	if (st->funcs.request) st->funcs.request(*data, url);
+	if (st->funcs.request) st->funcs.request(*data, url, req);
 
 	return 1;
 }

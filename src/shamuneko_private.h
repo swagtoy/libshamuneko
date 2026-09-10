@@ -29,6 +29,12 @@ struct _shamuneko_module
 	int version;
 };
 
+struct _shamuneko_request
+{
+	shamuneko_state_t *st;
+	int callback_ref;
+};
+
 #define _ASSERT_TOP do { assert(lua_gettop(_L) == 0); } while(0)
 
 // TODO: move this
