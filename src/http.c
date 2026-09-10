@@ -35,13 +35,24 @@ _luafunc_httpsession_create(lua_State *L)
 	return 1;
 }
 
-static struct luaL_Reg httpsession_meths[] = {
-	//{ "__gc", _luafunc_httpsession_close },
+static int
+_luafunc_httpsesssion_destroy(lua_State *L)
+{
+	shamuneko_state_t *st = lua_touserdata(L, lua_upvalueindex(1));
+	void **data = luaL_checkudata(L, 1, "HTTPSession");
+
+	if (st->funcs.destroy_session) st->funcs.destroy_session(*data);
+
+	return 0;
+}
+
+static struct luaL_Reg _httpsession_meths[] = {
 	{ "request", _luafunc_httpsession_request },
+	{ "__gc",    _luafunc_httpsesssion_destroy },
 	{ 0, 0 }
 };
 
-static struct luaL_Reg httpsession_funcs[] = {
+static struct luaL_Reg _httpsession_funcs[] = {
 	{ "new", _luafunc_httpsession_create },
 	{ 0, 0 }
 };
@@ -57,12 +68,12 @@ create_httpsession_table(shamuneko_state_t *st)
 
 	// setup methods and funcs
 	lua_pushlightuserdata(_L, st);
-	luaL_setfuncs(_L, httpsession_meths, 1);
+	luaL_setfuncs(_L, _httpsession_meths, 1);
 	lua_pop(_L, 1);
 
-	luaL_newlibtable(_L, httpsession_funcs);
+	luaL_newlibtable(_L, _httpsession_funcs);
 	lua_pushlightuserdata(_L, st);
-	luaL_setfuncs(_L, httpsession_funcs, 1);
+	luaL_setfuncs(_L, _httpsession_funcs, 1);
 
 	lua_setglobal(_L, "httpsession");
 
