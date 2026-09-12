@@ -2,11 +2,13 @@
 #include <lua5.4/lauxlib.h>
 #include "http.h"
 
+#define _METATABLE_NAME "HTTPSession"
+
 static int
 _luafunc_httpsession_request(lua_State *L)
 {
 	shamuneko_state_t *st = lua_touserdata(L, lua_upvalueindex(1));
-	void **data = luaL_checkudata(L, 1, "HTTPSession");
+	void **data = luaL_checkudata(L, 1, _METATABLE_NAME);
 	shamuneko_request_t *req = calloc(1, sizeof(struct _shamuneko_request));
 
 	req->st = st;
@@ -29,7 +31,7 @@ _luafunc_httpsession_create(lua_State *L)
 	// clear it incase st->funcs.create_session isn't set
 	*data = NULL;
 
-	luaL_getmetatable(_L, "HTTPSession");
+	luaL_getmetatable(_L, _METATABLE_NAME);
 	lua_setmetatable(_L, -2);
 
 	if (st->funcs.create_session) *data = st->funcs.create_session();
@@ -41,7 +43,7 @@ static int
 _luafunc_httpsesssion_destroy(lua_State *L)
 {
 	shamuneko_state_t *st = lua_touserdata(L, lua_upvalueindex(1));
-	void **data = luaL_checkudata(L, 1, "HTTPSession");
+	void **data = luaL_checkudata(L, 1, _METATABLE_NAME);
 
 	if (st->funcs.destroy_session) st->funcs.destroy_session(*data);
 
@@ -62,7 +64,7 @@ static struct luaL_Reg _httpsession_funcs[] = {
 void
 create_httpsession_table(shamuneko_state_t *st)
 {
-	luaL_newmetatable(_L, "HTTPSession");
+	luaL_newmetatable(_L, _METATABLE_NAME);
 
 	lua_pushliteral(_L, "__index");
 	lua_pushvalue(_L, -2);
