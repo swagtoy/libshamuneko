@@ -7,6 +7,9 @@ local http = httpsession.new()
 function mymodule.search(query)
 	http:request("https://example.com", function(data)
 		print('user searched "' .. query .. '" and got data: ' .. data)
+
+		local html = htmlparser.new(data)
+		print('Site title: ' .. html:children():children():children():content())
 	end)
 end
 

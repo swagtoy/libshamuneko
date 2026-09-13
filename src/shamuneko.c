@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include "shamuneko.h"
 #include "http.h"
+#include "html.h"
 
 #include "shamuneko_private.h"
 
@@ -25,6 +26,7 @@ shamuneko_new(struct shamuneko_http_funcs funcs)
 	_L = luaL_newstate();
 
 	create_httpsession_table(st);
+	create_htmlparser_table(st);
 
 	luaL_openlibs(_L);
 

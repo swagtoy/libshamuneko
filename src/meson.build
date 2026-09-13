@@ -2,10 +2,11 @@ sources = files('''
     shamuneko.c
     shamuneko_module.c
     http.c
+    html.c
 '''.split())
 
 libshamuneko_include = include_directories('.')
 
 libshamuneko = static_library('shamuneko',
     sources,
-    dependencies: [ lua_dep ])
+    dependencies: [ lua_dep, libxml2_dep ])
