@@ -40,7 +40,7 @@ _luafunc_httpsession_create(lua_State *L)
 }
 
 static int
-_luafunc_httpsesssion_destroy(lua_State *L)
+_luafunc_httpsession_destroy(lua_State *L)
 {
 	shamuneko_state_t *st = lua_touserdata(L, lua_upvalueindex(1));
 	void **data = luaL_checkudata(L, 1, _METATABLE_NAME);
@@ -52,7 +52,7 @@ _luafunc_httpsesssion_destroy(lua_State *L)
 
 static struct luaL_Reg _httpsession_meths[] = {
 	{ "request", _luafunc_httpsession_request },
-	{ "__gc",    _luafunc_httpsesssion_destroy },
+	{ "__gc",    _luafunc_httpsession_destroy },
 	{ 0, 0 }
 };
 
