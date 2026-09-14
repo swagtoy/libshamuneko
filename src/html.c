@@ -82,6 +82,27 @@ _luafunc_htmlparser_type(lua_State *L)
 }
 
 static int
+_luafunc_htmlparser_attr(lua_State *L)
+{
+	struct htmlparser_data *d = luaL_checkudata(L, 1, _METATABLE_NAME);
+	xmlAttr *props = d->node->properties;
+	if (!props)
+		return 0;
+
+	lua_newtable(L);
+	do
+	{
+		lua_pushstring(L, (char*)props->name);
+		lua_pushstring(L, (char*)props->children->content);
+		lua_rawset(L, -3);
+	}
+	while ((props = props->next));
+	//d->node->properties
+	//lua_pushstring(L, )
+	return 1;
+}
+
+static int
 _luafunc_htmlparser_create(lua_State *L)
 {
 	struct htmlparser_data *d = lua_newuserdata(L, sizeof(struct htmlparser_data));
@@ -139,6 +160,7 @@ static struct luaL_Reg _htmlparser_meths[] = {
 
 	{ "name", _luafunc_htmlparser_name },
 	{ "content", _luafunc_htmlparser_content },
+	{ "attr", _luafunc_htmlparser_attr },
 
 	{ "__gc", _luafunc_htmlparser_destroy },
 	{ 0, 0 }
