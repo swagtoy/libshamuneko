@@ -9,7 +9,8 @@ function mymodule.search(query)
 		print('user searched "' .. query .. '" and got data: ' .. data)
 
 		local html = htmlparser.new(data)
-		print('Site title: ' .. html:children():children():children():content())
+		print('Site title: ' .. html:children(3):content())
+
 	end)
 end
 

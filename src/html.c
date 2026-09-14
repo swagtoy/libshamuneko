@@ -32,19 +32,32 @@ _push_node(lua_State *L, struct htmlparser_data *d, xmlNode *node)
 	return 1;
 }
 
-#define _LUAFUNC_GEN_PUSH_NODE_FUNC(OP) \
+#define _LUAFUNC_GEN_PUSH_NODE_FUNC(OP, IS_RECURSIVE) \
 	static int \
 	_luafunc_htmlparser_ ## OP (lua_State *L) \
 	{ \
 		struct htmlparser_data *d = luaL_checkudata(L, 1, _METATABLE_NAME); \
-		return _push_node(L, d, d->node->OP ); \
+		xmlNode *node = d->node->OP; \
+		if (IS_RECURSIVE && lua_isinteger(L, -1)) { \
+			lua_Integer amt = lua_tointeger(L, -1); \
+			lua_pop(L, 1); \
+			/* wouldn't make sense */ \
+			if (amt <= 0) \
+				return 0; \
+			while (--amt) { \
+				if (node->OP == NULL) \
+					return 0; \
+				node = node->OP; \
+			} \
+		} \
+		return _push_node(L, d, node); \
 	}
 
-_LUAFUNC_GEN_PUSH_NODE_FUNC(next)
-_LUAFUNC_GEN_PUSH_NODE_FUNC(children)
-_LUAFUNC_GEN_PUSH_NODE_FUNC(parent)
-_LUAFUNC_GEN_PUSH_NODE_FUNC(prev)
-_LUAFUNC_GEN_PUSH_NODE_FUNC(last)
+_LUAFUNC_GEN_PUSH_NODE_FUNC(next, 1)
+_LUAFUNC_GEN_PUSH_NODE_FUNC(children, 1)
+_LUAFUNC_GEN_PUSH_NODE_FUNC(parent, 1)
+_LUAFUNC_GEN_PUSH_NODE_FUNC(prev, 1)
+_LUAFUNC_GEN_PUSH_NODE_FUNC(last, 0)
 
 #define _LUAFUNC_GEN_PUSH_STRING_FUNC(OP) \
 	static int \
