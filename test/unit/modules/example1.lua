@@ -9,8 +9,13 @@ function mymodule.search(query)
 		print('user searched "' .. query .. '" and got data: ' .. data)
 
 		local html = htmlparser.new(data)
-		print('Site title: ' .. html:children(3):content())
-
+		local head = html:children():next():children(2)
+		local pps = head:filter(function (e) return e:name() == 'p' end)
+		for i, v in ipairs(pps) do
+			print(v:name())
+		end
+		-- idea, ignore
+		--print('Site title: ' .. :select('meta', { name = 'viewport' }):attr()['content'])
 	end)
 end
 

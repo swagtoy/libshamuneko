@@ -133,6 +133,35 @@ _luafunc_htmlparser_attr(lua_State *L)
 }
 
 static int
+_luafunc_htmlparser_filter(lua_State *L)
+{
+	struct htmlparser_data *d = luaL_checkudata(L, 1, _METATABLE_NAME);
+	xmlNode *node = d->node;
+	int i = 0;
+
+	lua_newtable(L);
+	do
+	{
+		lua_pushvalue(L, 2);
+		_push_node(L, d, node);
+		lua_pcall(L, 1, 1, 0);
+		if (lua_isboolean(L, -1))
+		{
+			int keep = lua_toboolean(L, -1);
+			lua_pop(L, 1);
+			if (keep)
+			{
+				_push_node(L, d, node);
+				lua_rawseti(L, -2, ++i);
+			}
+		}
+	}
+	while ((node = node->next));
+
+	return 1;
+}
+
+static int
 _luafunc_htmlparser_create(lua_State *L)
 {
 	struct htmlparser_data *d = lua_newuserdata(L, sizeof(struct htmlparser_data));
@@ -181,12 +210,12 @@ static struct luaL_Reg _htmlparser_meths[] = {
 	{ "children", _luafunc_htmlparser_children },
 	{ "parent", _luafunc_htmlparser_parent },
 	{ "prev", _luafunc_htmlparser_prev },
-
 	{ "last", _luafunc_htmlparser_last },
 
 	{ "name", _luafunc_htmlparser_name },
 	{ "content", _luafunc_htmlparser_content },
 	{ "attr", _luafunc_htmlparser_attr },
+	{ "filter", _luafunc_htmlparser_filter },
 
 	{ "iter", _luafunc_htmlparser_iter },
 
