@@ -14,6 +14,14 @@ struct htmlparser_data
 	int *ref;
 };
 
+static void
+_cleanup_htmlparser_data(struct htmlparser_data *data)
+{
+	xmlFreeDoc(data->doc);
+	// node shouldn't need to be free'd, since it's part of the doc...
+	free(data->ref);
+}
+
 static int
 _push_node(lua_State *L, struct htmlparser_data *d, xmlNode *node)
 {
@@ -106,9 +114,8 @@ static int
 _luafunc_htmlparser_create(lua_State *L)
 {
 	struct htmlparser_data *d = lua_newuserdata(L, sizeof(struct htmlparser_data));
-	// is this already zerod?
 	d->ref = malloc(sizeof(int));
-	*d->ref = 0;
+	*d->ref = 1;
 
 	size_t len;
 	char const *str = lua_tolstring(L, -2, &len);
@@ -119,15 +126,12 @@ _luafunc_htmlparser_create(lua_State *L)
 		DEBUGF("Failed to parse HTML document \"%.*s%s\"",
 			(len > 70 ? 70 : (int)len), str, (len > 70 ? "..." : ""));
 		// TODO: cleanup
+		_cleanup_htmlparser_data(d);
 		return 0;
 	}
 
 	d->node = xmlDocGetRootElement(d->doc);
 	// TODO: null?
-
-	// the nodes will keep a refcount, i.e. if main htmlparser goes
-	// out of scope, we still want to keep our document alive
-	++(*d->ref);
 
 	luaL_getmetatable(L, _METATABLE_NAME);
 	lua_setmetatable(L, -2);
@@ -141,7 +145,7 @@ _luafunc_htmlparser_destroy(lua_State *L)
 	struct htmlparser_data *d = luaL_checkudata(L, 1, _METATABLE_NAME);
 	if (--(*d->ref) == 0)
 	{
-		xmlFreeDoc(d->doc);
+		_cleanup_htmlparser_data(d);
 		DEBUG("Freeing xml document");
 	}
 
