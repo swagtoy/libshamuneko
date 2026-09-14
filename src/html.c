@@ -40,6 +40,28 @@ _push_node(lua_State *L, struct htmlparser_data *d, xmlNode *node)
 	return 1;
 }
 
+/* -- the two methods below are for such
+ * for elem in node:iter() do
+ *     print(elem:name())
+ * end
+ */
+static int
+_luafunc_htmlparser_iter_step(lua_State *L)
+{
+	struct htmlparser_data *d = luaL_checkudata(L, (lua_isnil(L, 2) ? 1 : 2), _METATABLE_NAME);
+	return _push_node(L, d, (lua_isnil(L, 2) ? d->node : d->node->next));
+}
+
+static int
+_luafunc_htmlparser_iter(lua_State *L)
+{
+	lua_pushcclosure(L, _luafunc_htmlparser_iter_step, 0);
+	lua_pushvalue(L, 1); // idx:1 == our metatable
+	lua_pushnil(L);
+
+	return 3;
+}
+
 #define _LUAFUNC_GEN_PUSH_NODE_FUNC(OP, IS_RECURSIVE) \
 	static int \
 	_luafunc_htmlparser_ ## OP (lua_State *L) \
@@ -165,6 +187,8 @@ static struct luaL_Reg _htmlparser_meths[] = {
 	{ "name", _luafunc_htmlparser_name },
 	{ "content", _luafunc_htmlparser_content },
 	{ "attr", _luafunc_htmlparser_attr },
+
+	{ "iter", _luafunc_htmlparser_iter },
 
 	{ "__gc", _luafunc_htmlparser_destroy },
 	{ 0, 0 }
