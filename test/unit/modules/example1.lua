@@ -10,7 +10,7 @@ function mymodule.search(query)
 
 		local html = htmlparser.new(data)
 		local head = html:children():next():children(2)
-		local pps = head:filter(function (e) return e:name() == 'p' end)
+		local pps = head:filter("p", function (e) print(e:content(true)) end)
 		for i, v in ipairs(pps) do
 			print(v:name())
 		end

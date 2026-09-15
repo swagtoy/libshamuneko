@@ -89,19 +89,25 @@ _LUAFUNC_GEN_PUSH_NODE_FUNC(parent, 1)
 _LUAFUNC_GEN_PUSH_NODE_FUNC(prev, 1)
 _LUAFUNC_GEN_PUSH_NODE_FUNC(last, 0)
 
-#define _LUAFUNC_GEN_PUSH_STRING_FUNC(OP) \
+#define _LUAFUNC_GEN_PUSH_STRING_FUNC(OP, SHOULD_NEXT) \
 	static int \
 	_luafunc_htmlparser_ ## OP (lua_State *L) \
 	{ \
 		struct htmlparser_data *d = luaL_checkudata(L, 1, _METATABLE_NAME); \
-		if (!d->node->OP) \
+		xmlNode *node = d->node; \
+		if (SHOULD_NEXT && lua_isboolean(L, 2) && lua_toboolean(L, 2) == 1) \
+		{ \
+			if (node->OP == NULL) \
+				node = node->children; \
+		} \
+		if (!node->OP) \
 			return 0; \
-		lua_pushstring(L, (char*)d->node->OP); \
+		lua_pushstring(L, (char*)node->OP); \
 		return 1; \
 	}
 
-_LUAFUNC_GEN_PUSH_STRING_FUNC(content)
-_LUAFUNC_GEN_PUSH_STRING_FUNC(name)
+_LUAFUNC_GEN_PUSH_STRING_FUNC(content, 1)
+_LUAFUNC_GEN_PUSH_STRING_FUNC(name, 0)
 
 static int
 _luafunc_htmlparser_type(lua_State *L)
@@ -127,8 +133,7 @@ _luafunc_htmlparser_attr(lua_State *L)
 		lua_rawset(L, -3);
 	}
 	while ((props = props->next));
-	//d->node->properties
-	//lua_pushstring(L, )
+
 	return 1;
 }
 
@@ -137,11 +142,25 @@ _luafunc_htmlparser_filter(lua_State *L)
 {
 	struct htmlparser_data *d = luaL_checkudata(L, 1, _METATABLE_NAME);
 	xmlNode *node = d->node;
+	char const *elem = NULL;
 	int i = 0;
+
+	// check if first argument is a string, then we'll at least
+	// compare that element's :name() for convenience
+	if (lua_isstring(L, 2))
+	{
+		elem = lua_tostring(L, 2);
+		lua_remove(L, 2);
+	}
 
 	lua_newtable(L);
 	do
 	{
+		if (elem && strcmp(elem, (char*)node->name))
+		{
+			continue;
+		}
+		// copy and call filter func
 		lua_pushvalue(L, 2);
 		_push_node(L, d, node);
 		lua_pcall(L, 1, 1, 0);
@@ -154,6 +173,12 @@ _luafunc_htmlparser_filter(lua_State *L)
 				_push_node(L, d, node);
 				lua_rawseti(L, -2, ++i);
 			}
+		}
+		else {
+			// we're technically fine without a return value. in fact,
+			// it suffices perfectly that filter can also function as
+			// a simple foreach (though, maybe that use case could be
+			// misleading...)
 		}
 	}
 	while ((node = node->next));
