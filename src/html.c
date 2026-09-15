@@ -186,16 +186,49 @@ _luafunc_htmlparser_filter(lua_State *L)
 	return 1;
 }
 
+// kinda like filter, it takes similar arguments, but it stops at the
+// first element it matches, and doesn't return a list.
 static int
 _luafunc_htmlparser_find_first(lua_State *L)
 {
 	struct htmlparser_data *d = luaL_checkudata(L, 1, _METATABLE_NAME);
 	xmlNode *node = d->node;
 	char const *elem = lua_tostring(L, 2);
+	int has_func;
+
+	// check if first argument is a string, then we'll at least
+	// compare that element's :name() for convenience
+	if (lua_isstring(L, 2))
+	{
+		elem = lua_tostring(L, 2);
+		lua_remove(L, 2);
+	}
+
+	has_func = lua_isfunction(L, 2);
+
+	if (!(has_func || elem))
+		return 0;
 
 	do
 	{
-		if (!strcmp(elem, (char*)node->name))
+		int match = 0;
+		if (elem)
+			match |= !!strcmp(elem, (char*)node->name);
+
+		if (has_func)
+		{
+			lua_pushvalue(L, 2);
+			_push_node(L, d, node);
+			lua_pcall(L, 1, 1, 0);
+			if (lua_isboolean(L, -1))
+			{
+				int pass = lua_toboolean(L, -1);
+				lua_pop(L, 1);
+				match |= !pass;
+			}
+		}
+
+		if (match == 0)
 		{
 			_push_node(L, d, node);
 			return 1;
