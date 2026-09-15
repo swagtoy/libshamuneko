@@ -187,6 +187,26 @@ _luafunc_htmlparser_filter(lua_State *L)
 }
 
 static int
+_luafunc_htmlparser_find_first(lua_State *L)
+{
+	struct htmlparser_data *d = luaL_checkudata(L, 1, _METATABLE_NAME);
+	xmlNode *node = d->node;
+	char const *elem = lua_tostring(L, 2);
+
+	do
+	{
+		if (!strcmp(elem, (char*)node->name))
+		{
+			_push_node(L, d, node);
+			return 1;
+		}
+	}
+	while ((node = node->next));
+
+	return 0;
+}
+
+static int
 _luafunc_htmlparser_create(lua_State *L)
 {
 	struct htmlparser_data *d = lua_newuserdata(L, sizeof(struct htmlparser_data));
@@ -241,6 +261,7 @@ static struct luaL_Reg _htmlparser_meths[] = {
 	{ "content", _luafunc_htmlparser_content },
 	{ "attr", _luafunc_htmlparser_attr },
 	{ "filter", _luafunc_htmlparser_filter },
+	{ "find_first", _luafunc_htmlparser_find_first },
 
 	{ "iter", _luafunc_htmlparser_iter },
 
