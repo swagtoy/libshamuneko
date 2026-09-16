@@ -2,6 +2,7 @@
 #include "shamuneko.h"
 #include "http.h"
 #include "html.h"
+#include "json.h"
 
 #include "shamuneko_private.h"
 
@@ -27,7 +28,9 @@ shamuneko_new(struct shamuneko_http_funcs funcs)
 
 	create_httpsession_table(st);
 	create_htmlparser_table(st);
+	create_json_funcs(st);
 
+	// TODO: we're not going to be exposing all of this
 	luaL_openlibs(_L);
 
 	return st;
