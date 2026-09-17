@@ -35,6 +35,13 @@ struct _shamuneko_request
 	int callback_ref;
 };
 
+struct _result_data
+{
+	void *callback;
+	void *data;
+	int called;
+};
+
 #define _ASSERT_TOP do { assert(lua_gettop(_L) == 0); } while(0)
 
 // TODO: move this

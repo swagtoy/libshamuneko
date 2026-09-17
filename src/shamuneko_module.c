@@ -43,7 +43,31 @@ shamuneko_module_search(shamuneko_module_t *module,
 	_MODULE_ST;
 	_push_mod_table(module);
 	lua_getfield(_L, -1, "search");
+	// TODO: push search callback
 	lua_pushstring(_L, query);
+	lua_pcall(_L, 1, LUA_MULTRET, 0);
+	lua_pop(_L, 1);
+
+	_ASSERT_TOP;
+}
+
+void
+shamuneko_module_get_trending(shamuneko_module_t *module,
+                              get_trending_callback_t cb,
+							  void *data)
+{
+	_MODULE_ST;
+
+	_push_mod_table(module);
+	lua_getfield(_L, -1, "get_trending");
+	struct _result_data *result = lua_newuserdata(_L, sizeof(struct _result_data));
+	result->callback = cb;
+	result->data = data;
+	result->called = 0;
+	// TODO: A metatable with a __gc hook (i suppose) around the lua
+	// userdata here would be needed. if result->called == 0, but we
+	// GC, we could call the callback with NULL so the user could
+	// cleanup any possible void* data.
 	lua_pcall(_L, 1, LUA_MULTRET, 0);
 	lua_pop(_L, 1);
 

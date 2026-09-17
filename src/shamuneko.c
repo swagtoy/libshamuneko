@@ -6,6 +6,44 @@
 
 #include "shamuneko_private.h"
 
+#define SET_LFIELD(result, field) \
+	lua_getfield(L, -1, #field); \
+	if (lua_isstring(L, -1)) result->field = lua_tostring(L, -1); \
+	lua_pop(L, 1)
+
+static int
+_luafunc_trending_result(lua_State *L)
+{
+	//shamuneko_state_t *st = lua_touserdata(L, lua_upvalueindex(1));
+	struct _result_data *internal = lua_touserdata(L, 1);
+	get_trending_callback_t callback = internal->callback;
+	struct shamuneko_trending_result* results;
+
+	lua_len(L, 2);
+	int len = lua_tonumber(L, -1);
+	lua_pop(L, 1);
+
+	results = calloc(len, sizeof(struct shamuneko_trending_result));
+
+	for (int i = 1; i <= len; ++i)
+	{
+		struct shamuneko_trending_result *result = results + (i-1);
+		lua_geti(L, 2, i);
+
+		SET_LFIELD(result, id);
+		SET_LFIELD(result, name);
+		SET_LFIELD(result, description);
+		SET_LFIELD(result, cover);
+
+		lua_pop(L, 1);
+	}
+
+	if (callback) callback(results, len, internal->data);
+
+	return 0;
+}
+
+
 void
 shamuneko_process_request(shamuneko_request_t *internal, char *data, size_t data_len)
 {
@@ -29,6 +67,12 @@ shamuneko_new(struct shamuneko_http_funcs funcs)
 	create_httpsession_table(st);
 	create_htmlparser_table(st);
 	create_json_funcs(st);
+
+	// Result functions
+	//lua_pushlightuserdata(_L, st);
+	//lua_register(_L, "TrendingResult", _luafunc_trending_result);
+	lua_pushcfunction(_L, _luafunc_trending_result);
+	lua_setglobal(_L, "TrendingResult");
 
 	// TODO: we're not going to be exposing all of this
 	luaL_openlibs(_L);
