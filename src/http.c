@@ -8,17 +8,20 @@ static int
 _luafunc_httpsession_request(lua_State *L)
 {
 	shamuneko_state_t *st = lua_touserdata(L, lua_upvalueindex(1));
-	void **data = luaL_checkudata(L, 1, _METATABLE_NAME);
 	shamuneko_request_t *req = calloc(1, sizeof(struct _shamuneko_request));
-
-	req->st = st;
-	req->callback_ref = luaL_ref(L, LUA_REGISTRYINDEX);
+	void **data = luaL_checkudata(L, 1, _METATABLE_NAME);
 	char const *url = lua_tostring(L, -1);
+
+	req->co = L;
+	req->st = st;
+	// so it doesn't get garbage collected
+	lua_pushthread(L);
+	req->thread_ref = luaL_ref(L, LUA_REGISTRYINDEX);
 
 	DEBUGF("Request URL: %s", url);
 	if (st->funcs.request) st->funcs.request(*data, url, req);
 
-	return 1;
+	return lua_yield(L, 0);
 }
 
 static int

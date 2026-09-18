@@ -31,8 +31,9 @@ struct _shamuneko_module
 
 struct _shamuneko_request
 {
+	lua_State *co;
 	shamuneko_state_t *st;
-	int callback_ref;
+	int thread_ref;
 };
 
 struct _result_data

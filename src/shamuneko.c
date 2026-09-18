@@ -48,10 +48,13 @@ void
 shamuneko_process_request(shamuneko_request_t *internal, char *data, size_t data_len)
 {
 	struct _shamuneko_request *req = internal;
+	int noop;
+	lua_State *co = req->co;
 	shamuneko_state_t *st = req->st;
-	lua_rawgeti(_L, LUA_REGISTRYINDEX, req->callback_ref);
 	lua_pushlstring(_L, data, data_len);
-	lua_pcall(_L, 1, LUA_MULTRET, 0);
+	//lua_pcall(_L, 1, LUA_MULTRET, 0);
+	lua_resume(co, NULL, 1, &noop);
+	luaL_unref(co, LUA_REGISTRYINDEX, req->thread_ref);
 }
 
 shamuneko_state_t*

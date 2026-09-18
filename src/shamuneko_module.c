@@ -28,12 +28,11 @@ _create_module_storage(shamuneko_state_t *st)
 }
 
 static void
-_push_mod_table(shamuneko_module_t *module)
+_push_mod_table(lua_State *L, shamuneko_module_t *module)
 {
-	_MODULE_ST;
-	lua_rawgeti(_L, LUA_REGISTRYINDEX, module->tref);
+	lua_rawgeti(L, LUA_REGISTRYINDEX, module->tref);
 
-	assert(lua_istable(_L, -1));
+	assert(lua_istable(L, -1));
 }
 
 void
@@ -41,11 +40,15 @@ shamuneko_module_search(shamuneko_module_t *module,
                         char *query)
 {
 	_MODULE_ST;
-	_push_mod_table(module);
-	lua_getfield(_L, -1, "search");
+
+	int noop;
+	lua_State *co = lua_newthread(_L);
+	_push_mod_table(co, module);
+	lua_getfield(co, -1, "search");
 	// TODO: push search callback
-	lua_pushstring(_L, query);
-	lua_pcall(_L, 1, LUA_MULTRET, 0);
+	lua_pushstring(co, query);
+	lua_resume(co, _L, 1, &noop);
+	//lua_pcall(_L, 1, LUA_MULTRET, 0);
 	lua_pop(_L, 1);
 
 	_ASSERT_TOP;
@@ -58,19 +61,22 @@ shamuneko_module_get_trending(shamuneko_module_t *module,
 {
 	_MODULE_ST;
 
-	_push_mod_table(module);
-	lua_getfield(_L, -1, "get_trending");
-	struct _result_data *result = lua_newuserdata(_L, sizeof(struct _result_data));
+	int noop;
+	lua_State *co = lua_newthread(_L);
+	_push_mod_table(co, module);
+	lua_getfield(co, -1, "get_trending");
+	struct _result_data *result = lua_newuserdata(co, sizeof(struct _result_data));
 	result->callback = cb;
 	result->data = data;
 	result->called = 0;
+	// TODO: check if this TODO is still valid with coroutines
 	// TODO: A metatable with a __gc hook (i suppose) around the lua
 	// userdata here would be needed. if result->called == 0, but we
 	// GC, we could call the callback with NULL so the user could
 	// cleanup any possible void* data.
-	lua_pcall(_L, 1, LUA_MULTRET, 0);
-	lua_pop(_L, 1);
-
+	lua_resume(co, _L, 1, &noop);
+	//lua_pcall(_L, 1, LUA_MULTRET, 0);
+	lua_pop(_L, 2);
 	_ASSERT_TOP;
 }
 
