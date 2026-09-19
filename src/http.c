@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <lua5.4/lauxlib.h>
 #include "http.h"
+#include "shamuneko_private.h"
 
 #define _METATABLE_NAME "HTTPSession"
 
@@ -14,14 +15,24 @@ _luafunc_httpsession_request(lua_State *L)
 
 	req->co = L;
 	req->st = st;
-	// so it doesn't get garbage collected
-	lua_pushthread(L);
-	req->thread_ref = luaL_ref(L, LUA_REGISTRYINDEX);
 
 	DEBUGF("Request URL: %s", url);
+
 	if (st->funcs.request) st->funcs.request(*data, url, req);
 
-	return lua_yield(L, 0);
+	if (ST_HAS_FLAG(SHAMUNEKO_FLAG_SYNCHRONOUS))
+		// TODO: verify these arguments are on the stack
+		// the request was directly performed in the request func
+		// above. thus, we return 1 argument since
+		// shamuneko_process_request _should have_ already pushed our arguments
+		return 1;
+	else
+	{
+		// so it doesn't get garbage collected
+		lua_pushthread(L);
+		req->thread_ref = luaL_ref(L, LUA_REGISTRYINDEX);
+		return lua_yield(L, 0);
+	}
 }
 
 static int

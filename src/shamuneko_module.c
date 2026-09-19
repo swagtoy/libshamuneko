@@ -48,7 +48,6 @@ shamuneko_module_search(shamuneko_module_t *module,
 	// TODO: push search callback
 	lua_pushstring(co, query);
 	lua_resume(co, _L, 1, &noop);
-	//lua_pcall(_L, 1, LUA_MULTRET, 0);
 	lua_pop(_L, 1);
 
 	_ASSERT_TOP;
@@ -61,7 +60,7 @@ shamuneko_module_get_trending(shamuneko_module_t *module,
 {
 	_MODULE_ST;
 
-	int noop;
+	int noop = 0;
 	lua_State *co = lua_newthread(_L);
 	_push_mod_table(co, module);
 	lua_getfield(co, -1, "get_trending");
@@ -75,8 +74,7 @@ shamuneko_module_get_trending(shamuneko_module_t *module,
 	// GC, we could call the callback with NULL so the user could
 	// cleanup any possible void* data.
 	lua_resume(co, _L, 1, &noop);
-	//lua_pcall(_L, 1, LUA_MULTRET, 0);
-	lua_pop(_L, 2);
+	lua_pop(_L, 1);
 	_ASSERT_TOP;
 }
 

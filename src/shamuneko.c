@@ -51,18 +51,24 @@ shamuneko_process_request(shamuneko_request_t *internal, char *data, size_t data
 	int noop;
 	lua_State *co = req->co;
 	shamuneko_state_t *st = req->st;
-	lua_pushlstring(_L, data, data_len);
+	if (!ST_HAS_FLAG(SHAMUNEKO_FLAG_SYNCHRONOUS))
+		lua_pushthread(co);
+	lua_pushlstring(co, data, data_len);
 	//lua_pcall(_L, 1, LUA_MULTRET, 0);
-	lua_resume(co, NULL, 1, &noop);
-	luaL_unref(co, LUA_REGISTRYINDEX, req->thread_ref);
+	if (!ST_HAS_FLAG(SHAMUNEKO_FLAG_SYNCHRONOUS))
+	{
+		lua_resume(co, _L, 1, &noop);
+		luaL_unref(co, LUA_REGISTRYINDEX, req->thread_ref);
+	}
 }
 
 shamuneko_state_t*
-shamuneko_new(struct shamuneko_http_funcs funcs)
+shamuneko_new(shamuneko_flags_t flags, struct shamuneko_http_funcs funcs)
 {
 	shamuneko_state_t *st = calloc(1, sizeof(shamuneko_state_t));
 	if (!st)
 		return NULL;
+	st->flags = flags;
 	st->funcs = funcs;
 
 	_L = luaL_newstate();

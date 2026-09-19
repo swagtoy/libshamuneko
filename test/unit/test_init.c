@@ -37,7 +37,7 @@ _destroy_session_func(void *odata)
 int
 main()
 {
-	shamuneko_state_t *state = shamuneko_new((struct shamuneko_http_funcs){
+	shamuneko_state_t *state = shamuneko_new(SHAMUNEKO_FLAG_SYNCHRONOUS, (struct shamuneko_http_funcs){
 		.create_session = _create_session_func,
 		.request = _handle_req_func,
 		.destroy_session = _destroy_session_func,

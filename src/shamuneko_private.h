@@ -1,8 +1,9 @@
 #ifndef _SHAMUNEKO_PRIVATE_H_
 #define _SHAMUNEKO_PRIVATE_H_
 
+#include <stdint.h>
 #include <assert.h>
-#include "shamuneko.h"
+#include "shamuneko_types.h"
 #include <lua5.4/lua.h>
 #include <lua5.4/lauxlib.h>
 #include <lua5.4/lualib.h>
@@ -18,6 +19,7 @@
 struct _shamuneko_state
 {
 	lua_State *L;
+	shamuneko_flags_t flags;
 	struct shamuneko_http_funcs funcs;
 };
 
@@ -43,6 +45,7 @@ struct _result_data
 	int called;
 };
 
+#define ST_HAS_FLAG(FLAG) ((st->flags & FLAG) == FLAG)
 #define _ASSERT_TOP do { assert(lua_gettop(_L) == 0); } while(0)
 
 // TODO: move this

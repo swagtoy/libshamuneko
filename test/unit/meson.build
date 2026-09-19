@@ -9,7 +9,10 @@ foreach t : tests
         link_with: libshamuneko,
         dependencies: (t.length() > 1) ? t[1] : [],
         override_options: 'b_ndebug=false',
-		c_args: '-DTESTS_DIR="' + meson.current_source_dir() + '/"',
+		c_args: [
+            '-DTESTS_DIR="' + meson.current_source_dir() + '/"',
+            '-DPROJ_DIR="' + meson.project_source_root() + '/"',
+        ],
         include_directories: libshamuneko_include)
     test(t[0], tt)
 endforeach
