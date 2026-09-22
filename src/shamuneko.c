@@ -4,6 +4,7 @@
 #include "html.h"
 #include "json.h"
 #include "returnfuncs.h"
+#include "util.h"
 
 #include "shamuneko_private.h"
 
@@ -54,11 +55,7 @@ shamuneko_process_request(shamuneko_request_t *internal, char *data, size_t data
 	lua_State *co = req->co;
 	shamuneko_state_t *st = req->st;
 
-	// TODO move below to ext func
-	lua_pushthread(co);
-	lua_gettable(co, LUA_REGISTRYINDEX);
-	struct _result_data *result = lua_touserdata(co, -1);
-	lua_pop(co, 2);
+	struct _result_data *result = data_from_regidx(co);
 
 	if (!ST_HAS_FLAG(SHAMUNEKO_FLAG_SYNCHRONOUS))
 		lua_pushthread(co);

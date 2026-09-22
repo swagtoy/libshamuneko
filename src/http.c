@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <lua5.4/lauxlib.h>
 #include "http.h"
+#include "util.h"
+
 #include "shamuneko_private.h"
 
 #define _METATABLE_NAME "HTTPSession"
@@ -9,10 +11,7 @@ static int
 _luafunc_httpsession_request(lua_State *L)
 {
 	// TODO move below to ext func
-	lua_pushthread(L);
-	lua_gettable(L, LUA_REGISTRYINDEX);
-	struct _result_data *result = lua_touserdata(L, -1);
-	lua_pop(L, 1);
+	struct _result_data *result = data_from_regidx(L);
 
 	shamuneko_state_t *st = lua_touserdata(L, lua_upvalueindex(1));
 	shamuneko_request_t *req = calloc(1, sizeof(struct _shamuneko_request));

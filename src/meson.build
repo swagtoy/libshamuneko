@@ -5,6 +5,7 @@ sources = files('''
     html.c
     json.c
     returnfuncs.c
+    util.c
 '''.split())
 
 libshamuneko_include = include_directories('.')
