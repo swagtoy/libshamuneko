@@ -43,6 +43,7 @@ struct _result_data
 	void *callback;
 	void *data;
 	int called;
+	int (*return_func)(lua_State *L, struct _result_data *data);
 };
 
 #define ST_HAS_FLAG(FLAG) ((st->flags & FLAG) == FLAG)

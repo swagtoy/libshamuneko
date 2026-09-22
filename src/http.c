@@ -8,6 +8,12 @@
 static int
 _luafunc_httpsession_request(lua_State *L)
 {
+	// TODO move below to ext func
+	lua_pushthread(L);
+	lua_gettable(L, LUA_REGISTRYINDEX);
+	struct _result_data *result = lua_touserdata(L, -1);
+	lua_pop(L, 1);
+
 	shamuneko_state_t *st = lua_touserdata(L, lua_upvalueindex(1));
 	shamuneko_request_t *req = calloc(1, sizeof(struct _shamuneko_request));
 	void **data = luaL_checkudata(L, 1, _METATABLE_NAME);

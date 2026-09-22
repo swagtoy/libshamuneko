@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include "shamuneko_module.h"
+#include "returnfuncs.h"
 
 #include "shamuneko_private.h"
 
@@ -67,13 +68,20 @@ shamuneko_module_get_trending(shamuneko_module_t *module,
 	struct _result_data *result = lua_newuserdata(co, sizeof(struct _result_data));
 	result->callback = cb;
 	result->data = data;
-	result->called = 0;
+	result->return_func = return_func_get_trending;
+	// we keep track of how we must return by attaching data to this
+	// thread, with the thread as the key ;]
+	lua_pushthread(co);
+	lua_pushvalue(co, -2); // our new userdata
+	lua_settable(co, LUA_REGISTRYINDEX);
+
 	// TODO: check if this TODO is still valid with coroutines
 	// TODO: A metatable with a __gc hook (i suppose) around the lua
 	// userdata here would be needed. if result->called == 0, but we
 	// GC, we could call the callback with NULL so the user could
 	// cleanup any possible void* data.
-	lua_resume(co, _L, 1, &noop);
+	if (lua_resume(co, _L, 1, &noop) == LUA_OK)
+		result->return_func(co, result);
 	lua_pop(_L, 1);
 	_ASSERT_TOP;
 }
