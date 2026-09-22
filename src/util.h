@@ -25,12 +25,12 @@
 	// Also: we restore the offset when done, to allow checking with
 	// GUARD_LUA_STACK too.
 #	define GUARD_LUA_STACK_CHECK(OFFSET) \
-	if (1) { \
+	do { \
 		int tmp = __GLSINFO.offset; \
 		 __GLSINFO.offset = OFFSET; \
 		guard_lua_stack_assert(&__GLSINFO); \
 		__GLSINFO.offset = tmp; \
-	} (void)0
+	} while(0)
 #	define GUARD_LUA_STACK(L, OFFSET) \
 		__attribute__((cleanup(guard_lua_stack_assert))) GUARD_LUA_STACK_INIT(L); \
 		__GLSINFO.offset = OFFSET
@@ -40,6 +40,7 @@
 #	define GUARD_LUA_STACK_END(OFFSET)
 #endif
 
-struct _result_data* data_from_regidx(lua_State *L);
+SHAMUNEKO_PRIVATE void                 dump_stack(lua_State *L, int from, int to);
+SHAMUNEKO_PRIVATE struct _result_data* data_from_regidx(lua_State *L);
 
 #endif // _UTIL_H_
