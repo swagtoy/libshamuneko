@@ -10,5 +10,10 @@ void                shamuneko_module_search(shamuneko_module_t *module, char *qu
 void                shamuneko_module_get_trending(shamuneko_module_t *module,
                                                   get_trending_callback_t cb,
                                                   void *data);
+void                shamuneko_module_get_pages(shamuneko_module_t *module,
+                                               char const *id,
+                                               unsigned chapter,
+                                               get_pages_callback_t cb,
+                                               void *data);
 
 #endif // _SHAMUNEKO_MODULE_H_

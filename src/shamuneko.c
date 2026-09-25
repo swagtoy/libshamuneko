@@ -14,6 +14,7 @@ shamuneko_process_request(shamuneko_request_t *internal, char *data, size_t data
 	struct _shamuneko_request *req = internal;
 	int noop;
 	lua_State *co = req->co;
+	GUARD_LUA_STACK_INIT(co);
 	shamuneko_state_t *st = req->st;
 
 	struct _result_data *result = data_from_regidx(co);
@@ -28,6 +29,8 @@ shamuneko_process_request(shamuneko_request_t *internal, char *data, size_t data
 			result->return_func(co, result);
 		luaL_unref(co, LUA_REGISTRYINDEX, req->thread_ref);
 	}
+	else
+		GUARD_LUA_STACK_CHECK(1);
 }
 
 shamuneko_state_t*

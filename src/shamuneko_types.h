@@ -21,9 +21,17 @@ struct shamuneko_trending_result
 	char const *id, *name, *description, *cover;
 };
 
+struct shamuneko_pages_result
+{
+	char const *img_url;
+};
+
 typedef void (*get_trending_callback_t)(struct shamuneko_trending_result *results,
                                         size_t len,
                                         void *data);
+typedef void (*get_pages_callback_t)(struct shamuneko_pages_result *results,
+                                     size_t len,
+                                     void *data);
 
 struct shamuneko_http_funcs
 {

@@ -81,6 +81,18 @@ _get_trending_cb(struct shamuneko_trending_result *result, size_t len, void *dat
 	puts("Trending callback received...");
 }
 
+static void
+_get_pages_cb(struct shamuneko_pages_result *result, size_t len, void *data)
+{
+	puts("Pages callback received...");
+
+	for (int i = 0; i < len; ++i)
+	{
+		printf("\tPage %d: %s\n", i+1, result[i].img_url);
+	}
+}
+
+
 int
 main()
 {
@@ -120,6 +132,7 @@ main()
 
 	//shamuneko_module_search(pepperandcarrot, "help");
 	shamuneko_module_get_trending(pepperandcarrot, _get_trending_cb, NULL);
+	shamuneko_module_get_pages(pepperandcarrot, "peppercarrot", 0, _get_pages_cb, NULL);
 
 	shamuneko_module_destroy(pepperandcarrot);
 #endif

@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include "shamuneko_module.h"
 #include "returnfuncs.h"
+#include "util.h"
 
 #include "shamuneko_private.h"
 
@@ -40,6 +41,7 @@ void
 shamuneko_module_search(shamuneko_module_t *module,
                         char *query)
 {
+#if 0
 	_MODULE_ST;
 
 	int noop;
@@ -52,19 +54,22 @@ shamuneko_module_search(shamuneko_module_t *module,
 	lua_pop(_L, 1);
 
 	_ASSERT_TOP;
+#endif
 }
 
 void
 shamuneko_module_get_trending(shamuneko_module_t *module,
                               get_trending_callback_t cb,
-							  void *data)
+                              void *data)
 {
 	_MODULE_ST;
+	GUARD_LUA_STACK(_L, 0);
 
 	int noop = 0;
 	lua_State *co = lua_newthread(_L);
 	_push_mod_table(co, module);
 	lua_getfield(co, -1, "get_trending");
+	lua_remove(co, -2); // get our table off the table
 	struct _result_data *result = lua_newuserdata(co, sizeof(struct _result_data));
 	result->callback = cb;
 	result->data = data;
@@ -74,17 +79,57 @@ shamuneko_module_get_trending(shamuneko_module_t *module,
 	lua_pushthread(co);
 	lua_pushvalue(co, -2); // our new userdata
 	lua_settable(co, LUA_REGISTRYINDEX);
+	lua_pop(co, 1);
 
 	// TODO: check if this TODO is still valid with coroutines
 	// TODO: A metatable with a __gc hook (i suppose) around the lua
 	// userdata here would be needed. if result->called == 0, but we
 	// GC, we could call the callback with NULL so the user could
 	// cleanup any possible void* data.
-	if (lua_resume(co, _L, 1, &noop) == LUA_OK)
+	if (lua_resume(co, _L, 0, &noop) == LUA_OK)
+	{
 		result->return_func(co, result);
+	}
 	lua_pop(_L, 1);
-	_ASSERT_TOP;
 }
+
+void
+shamuneko_module_get_pages(shamuneko_module_t *module,
+                           char const *id,
+                           unsigned chapter,
+                           get_pages_callback_t cb,
+                           void *data)
+{
+	_MODULE_ST;
+	GUARD_LUA_STACK(_L, 0);
+
+	int noop = 0;
+	lua_State *co = lua_newthread(_L);
+	_push_mod_table(co, module);
+	lua_getfield(co, -1, "get_pages");
+	lua_remove(co, -2); // get our table off the table
+	struct _result_data *result = lua_newuserdata(co, sizeof(struct _result_data));
+	result->callback = cb;
+	result->data = data;
+	result->return_func = return_func_get_pages;
+	// we keep track of how we must return by attaching data to this
+	// thread, with the thread as the key ;]
+	lua_pushthread(co);
+	lua_pushvalue(co, -2); // our new userdata
+	lua_settable(co, LUA_REGISTRYINDEX);
+	lua_pop(co, 1);
+	// args
+	lua_pushstring(co, id);
+	lua_pushinteger(co, chapter);
+
+	// see last comment
+	if (lua_resume(co, _L, 2, &noop) == LUA_OK)
+	{
+		result->return_func(co, result);
+	}
+	lua_pop(_L, 1);
+}
+
 
 shamuneko_module_t*
 shamuneko_module_load(shamuneko_state_t *st,

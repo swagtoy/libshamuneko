@@ -17,6 +17,8 @@ _luafunc_httpsession_request(lua_State *L)
 	shamuneko_request_t *req = calloc(1, sizeof(struct _shamuneko_request));
 	void **data = luaL_checkudata(L, 1, _METATABLE_NAME);
 	char const *url = lua_tostring(L, -1);
+	lua_pop(L, 1);
+	GUARD_LUA_STACK_INIT(L);
 
 	req->co = L;
 	req->st = st;
@@ -26,16 +28,20 @@ _luafunc_httpsession_request(lua_State *L)
 	if (st->funcs.request) st->funcs.request(*data, url, req);
 
 	if (ST_HAS_FLAG(SHAMUNEKO_FLAG_SYNCHRONOUS))
+	{
 		// TODO: verify these arguments are on the stack
 		// the request was directly performed in the request func
 		// above. thus, we return 1 argument since
 		// shamuneko_process_request _should have_ already pushed our arguments
+		GUARD_LUA_STACK_CHECK(1);
 		return 1;
-	else
-	{
+	}
+	else {
 		// so it doesn't get garbage collected
 		lua_pushthread(L);
 		req->thread_ref = luaL_ref(L, LUA_REGISTRYINDEX);
+		// XXX: No idea if this guard check is right
+		GUARD_LUA_STACK_CHECK(0);
 		return lua_yield(L, 0);
 	}
 }
@@ -43,6 +49,7 @@ _luafunc_httpsession_request(lua_State *L)
 static int
 _luafunc_httpsession_create(lua_State *L)
 {
+	GUARD_LUA_STACK(L, 1);
 	void **data;
 	shamuneko_state_t *st = lua_touserdata(L, lua_upvalueindex(1));
 
@@ -61,6 +68,7 @@ _luafunc_httpsession_create(lua_State *L)
 static int
 _luafunc_httpsession_destroy(lua_State *L)
 {
+	GUARD_LUA_STACK(L, 0);
 	shamuneko_state_t *st = lua_touserdata(L, lua_upvalueindex(1));
 	void **data = luaL_checkudata(L, 1, _METATABLE_NAME);
 
