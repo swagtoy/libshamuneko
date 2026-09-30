@@ -13,6 +13,7 @@ endforeach
 
 lua_lib = static_library('lua_static',
     lua_sources,
+    gnu_symbol_visibility: 'hidden',
     dependencies: [meson.get_compiler('c').find_library('m')]
 )
 
