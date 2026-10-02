@@ -35,7 +35,13 @@ if get_option('libxml2_static')
 else
     #libxml2_dep = dependency('libxml-2.0', required: true)
 endif
-cjson_dep = dependency('libcjson', required: true)
+
+if get_option('cjson_static')
+    cjson_subp = subproject('cjson_static')
+    cjson_dep = cjson_subp.get_variable('cjson_dep')
+else
+    cjson_dep = dependency('libcjson', required: true)
+endif
 
 subdir('src')
 subdir('test/unit')
