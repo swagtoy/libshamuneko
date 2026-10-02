@@ -1,1 +1,2 @@
 option('lua_static', type: 'boolean', value: true, description: 'Build lua statically into libshamuneko')
+option('libxml2_static', type: 'boolean', value: true, description: 'Build libxml2 statically into libshamuneko')

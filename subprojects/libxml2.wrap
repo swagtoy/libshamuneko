@@ -1,0 +1,5 @@
+[wrap-file]
+directory = libxml2-v2.15.4
+source_url = https://gitlab.gnome.org/GNOME/libxml2/-/archive/v2.15.4/libxml2-v2.15.4.tar.gz
+source_filename = libxml2-v2.15.4.tar.gz
+source_hash = a569ee9c59eabb197a0d5047046d757ee14c86fb2d4a734555b633cb5584ad25

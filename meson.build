@@ -16,7 +16,25 @@ if get_option('lua_static')
 else
     lua_dep = dependency('lua5.4', required: true)
 endif
-libxml2_dep = dependency('libxml-2.0', required: true)
+
+if get_option('libxml2_static')
+    libxml2_subp = subproject('libxml2', default_options: [
+        'iconv=disabled', 'threads=disabled', 'regexps=disabled',
+    ])
+    xml_src_files = libxml2_subp.get_variable('xml_src_files')
+    xml_includes = libxml2_subp.get_variable('config_dir')
+    libxml2_lib = static_library('xml2',
+        xml_src_files,
+        dependencies: libxml2_subp.get_variable('xml_deps'),
+        include_directories: xml_includes,
+    )
+    libxml2_dep = declare_dependency(
+        link_with: libxml2_lib,
+        include_directories: xml_includes,
+    )
+else
+    #libxml2_dep = dependency('libxml-2.0', required: true)
+endif
 cjson_dep = dependency('libcjson', required: true)
 
 subdir('src')
