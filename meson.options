@@ -1,3 +1,4 @@
 option('lua_static', type: 'boolean', value: true, description: 'Build lua statically into libshamuneko')
 option('libxml2_static', type: 'boolean', value: true, description: 'Build libxml2 statically into libshamuneko')
 option('cjson_static', type: 'boolean', value: true, description: 'Build cJSON statically into libshamuneko')
+option('libcurl_tests', type: 'boolean', value: false, description: 'Build libcurl tests')
