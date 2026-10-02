@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include <lua5.4/lauxlib.h>
+#include <lauxlib.h>
 #include "http.h"
 #include "util.h"
 

@@ -4,9 +4,9 @@
 #include <stdint.h>
 #include <assert.h>
 #include "shamuneko_types.h"
-#include <lua5.4/lua.h>
-#include <lua5.4/lauxlib.h>
-#include <lua5.4/lualib.h>
+#include <lua.h>
+#include <lauxlib.h>
+#include <lualib.h>
 
 #ifdef __GNUC__
 #	define SHAMUNEKO_PRIVATE __attribute__((visibility("hidden")))

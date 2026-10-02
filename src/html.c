@@ -1,6 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
-#include <lua5.4/lauxlib.h>
+#include <lauxlib.h>
 #include "html.h"
 #include <libxml/HTMLparser.h>
 

@@ -1,4 +1,4 @@
-#include <cjson/cJSON.h>
+#include <cJSON.h>
 #include "json.h"
 
 static void
