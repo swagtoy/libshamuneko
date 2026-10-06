@@ -94,6 +94,8 @@ _download_pages_cb(struct shamuneko_pages_result *pages, size_t len, void *data)
 			printf("not jpeg - ");
 		printf("page %d : %s\n", i, (char const*)pages->img);
 	}
+
+	shamuneko_pages_to_cbz_file("crapshoot.cbz", pages, len);
 }
 
 static void

@@ -1,9 +1,11 @@
+#include <math.h>
 #include <stdlib.h>
 #include "shamuneko.h"
 #include "http.h"
 #include "html.h"
 #include "json.h"
 #include "util.h"
+#include "miniz.h"
 
 #include "shamuneko_private.h"
 
@@ -125,6 +127,26 @@ shamuneko_download_pages(shamuneko_state_t *st,
 
 		st->funcs.request(NULL /* NG :( */, pages[i].img_url, (shamuneko_request_t*)req);
 	}
+}
+
+void
+shamuneko_pages_to_cbz_file(char const *output_filename, struct shamuneko_pages_result *pages, size_t len)
+{
+	// TODO: lotta error checking
+	char filename[16];
+	mz_zip_archive zip = { 0 };
+	mz_zip_writer_init_file(&zip, output_filename, 0);
+
+	for (int i = 0; i < len; ++i)
+	{
+		// zero pad with one more than the number of pages
+		int padding = floorf(log10(len))+2;
+		snprintf(filename, sizeof(filename)-1, "%0*d.jpg", padding, i);
+		mz_zip_writer_add_mem(&zip, filename, pages[i].img, pages[i].img_size, MZ_DEFAULT_COMPRESSION);
+	}
+	mz_zip_writer_finalize_archive(&zip);
+	mz_zip_writer_end(&zip);
+
 }
 
 void
