@@ -1,14 +1,16 @@
 #ifndef _SHAMUNEKO_PRIVATE_H_
 #define _SHAMUNEKO_PRIVATE_H_
 
-#include <stdint.h>
-#include <assert.h>
+#ifndef SHAMUNEKO_AMALGAMATION_HEADER
+#	include <stdint.h>
+#	include <assert.h>
+#	include <lua.h>
+#	include <lauxlib.h>
+#	include <lualib.h>
+#endif
 #include "shamuneko_types.h"
-#include <lua.h>
-#include <lauxlib.h>
-#include <lualib.h>
 
-#ifdef __GNUC__
+#if defined(__GNUC__) && !defined(SHAMUNEKO_AMALGAMATION_HEADER)
 #	define SHAMUNEKO_PRIVATE __attribute__((visibility("hidden")))
 #else
 #	define SHAMUNEKO_PRIVATE

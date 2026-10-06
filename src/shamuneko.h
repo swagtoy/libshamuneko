@@ -1,8 +1,10 @@
 #ifndef _SHAMUNEKO_H_
 #define _SHAMUNEKO_H_
 
-#include <stdbool.h>
-#include <stddef.h>
+#ifdef SHAMUNEKO_AMALGAMATION_HEADER
+#	include <stdbool.h>
+#	include <stddef.h>
+#endif
 #include "shamuneko_types.h"
 #include "shamuneko_module.h"
 

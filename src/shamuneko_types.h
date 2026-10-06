@@ -1,8 +1,10 @@
 #ifndef _SHAMUNEKO_TYPES_H_
 #define _SHAMUNEKO_TYPES_H_
 
-#include <stdint.h>
-#include <stddef.h>
+#ifndef SHAMUNEKO_AMALGAMATION_HEADER
+#	include <stdint.h>
+#	include <stddef.h>
+#endif
 
 typedef uint8_t shamuneko_flags_t;
 #define SHAMUNEKO_FLAG_SYNCHRONOUS (1<<2)
