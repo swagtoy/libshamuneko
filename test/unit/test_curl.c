@@ -39,16 +39,17 @@ static void*
 _create_session_func()
 {
 	// could be done in _handle_req_func, but we're only proving a point
-	return curl_easy_init();
+	return NULL;//curl_easy_init();
 }
 
 static int
 _handle_req_func(void *odata, char const *url, shamuneko_request_t *internal)
 {
-	CURL *curl = odata;
+	CURL *curl = curl_easy_init();
 	struct memory chunk = { 0 };
 
 	curl_easy_setopt(curl, CURLOPT_URL, url);
+	printf("Fetching URL %s\n", url);
 	curl_easy_setopt(curl, CURLOPT_PRIVATE, internal);
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, _write);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &chunk);
@@ -61,7 +62,7 @@ _handle_req_func(void *odata, char const *url, shamuneko_request_t *internal)
 
 	shamuneko_process_request(internal, chunk.data, chunk.size);
 
-	free(chunk.data);
+	curl_easy_cleanup(curl);
 
 	return 0;
 }
@@ -69,8 +70,8 @@ _handle_req_func(void *odata, char const *url, shamuneko_request_t *internal)
 static void
 _destroy_session_func(void *odata)
 {
-	printf("DESTROYING SESSION %p\n", odata);
-	curl_easy_cleanup(odata);
+	//printf("DESTROYING SESSION %p\n", odata);
+	//curl_easy_cleanup(odata);
 }
 
 ////////////
@@ -78,17 +79,34 @@ _destroy_session_func(void *odata)
 static void
 _get_trending_cb(struct shamuneko_trending_result *result, size_t len, void *data)
 {
-	puts("Trending callback received...");
+	puts("Trwending callback received...");
 }
 
 static void
-_get_pages_cb(struct shamuneko_pages_result *result, size_t len, void *data)
+_download_pages_cb(struct shamuneko_pages_result *pages, size_t len, void *data)
 {
+	printf("Pages downloaded!\n");
+	for (int i = 0; i < len; ++i)
+	{
+		if ((unsigned char)pages->img[0] == 0xFF && (unsigned char)pages->img[1] == 0xD8)
+			printf("jpeg - ");
+		else
+			printf("not jpeg - ");
+		printf("page %d : %s\n", i, (char const*)pages->img);
+	}
+}
+
+static void
+_get_pages_cb(struct shamuneko_pages_result *pages, size_t len, void *data)
+{
+	shamuneko_state_t *st = data;
 	puts("Pages callback received...");
+
+	shamuneko_download_pages(st, pages, len, _download_pages_cb, NULL);
 
 	for (int i = 0; i < len; ++i)
 	{
-		printf("\tPage %d: %s\n", i+1, result[i].img_url);
+		printf("\tPage %d: %s\n", i+1, pages[i].img_url);
 	}
 }
 
@@ -132,7 +150,7 @@ main()
 
 	//shamuneko_module_search(pepperandcarrot, "help");
 	shamuneko_module_get_trending(pepperandcarrot, _get_trending_cb, NULL);
-	shamuneko_module_get_pages(pepperandcarrot, "peppercarrot", 0, _get_pages_cb, NULL);
+	shamuneko_module_get_pages(pepperandcarrot, "peppercarrot", 0, _get_pages_cb, state /* TODO: Not the case later */);
 
 	shamuneko_module_destroy(pepperandcarrot);
 #endif

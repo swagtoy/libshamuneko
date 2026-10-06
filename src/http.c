@@ -14,7 +14,8 @@ _luafunc_httpsession_request(lua_State *L)
 	struct _result_data *result = data_from_regidx(L);
 
 	shamuneko_state_t *st = lua_touserdata(L, lua_upvalueindex(1));
-	shamuneko_request_t *req = calloc(1, sizeof(struct _shamuneko_request));
+	struct _shamuneko_request_page *req = calloc(1, sizeof(struct _shamuneko_request_page));
+	req->base.type = SHAMUNEKO_REQUEST_TYPE_PAGE;
 	void **data = luaL_checkudata(L, 1, _METATABLE_NAME);
 	char const *url = lua_tostring(L, -1);
 	lua_pop(L, 1);
@@ -25,7 +26,7 @@ _luafunc_httpsession_request(lua_State *L)
 
 	DEBUGF("Request URL: %s", url);
 
-	if (st->funcs.request) st->funcs.request(*data, url, req);
+	if (st->funcs.request) st->funcs.request(*data, url, (shamuneko_request_t*)req);
 
 	if (ST_HAS_FLAG(SHAMUNEKO_FLAG_SYNCHRONOUS))
 	{

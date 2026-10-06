@@ -31,11 +31,41 @@ struct _shamuneko_module
 	int version;
 };
 
+enum _shamuneko_request_type
+{
+	SHAMUNEKO_REQUEST_TYPE_PAGE,
+	SHAMUNEKO_REQUEST_TYPE_DATA,
+};
+
 struct _shamuneko_request
 {
+	enum _shamuneko_request_type type;
+};
+
+struct _shamuneko_request_page  // type for fetching pages of urls
+{
+	struct _shamuneko_request base;
 	lua_State *co;
 	shamuneko_state_t *st;
 	int thread_ref;
+};
+
+struct _shamuneko_request_data_shared
+{
+	shamuneko_state_t *st;
+	struct shamuneko_pages_result *pages;
+	size_t pages_len;
+	size_t pages_left;
+
+	download_pages_callback_t callback;
+	void *callback_data;
+};
+
+struct _shamuneko_request_data  // type for fetching data like png's
+{
+	struct _shamuneko_request base;
+	struct _shamuneko_request_data_shared *shared;
+	size_t page_idx;
 };
 
 struct _result_data

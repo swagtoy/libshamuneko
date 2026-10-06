@@ -9,7 +9,7 @@ sources = files('''
 '''.split())
 
 libshamuneko_include = include_directories('.')
-libshamuneko_deps = [ lua_dep, libxml2_dep, cjson_dep ]
+libshamuneko_deps = [ lua_dep, libxml2_dep, cjson_dep, miniz_dep ]
 
 libshamuneko = static_library('shamuneko',
     sources,

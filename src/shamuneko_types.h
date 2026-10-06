@@ -24,7 +24,14 @@ struct shamuneko_trending_result
 struct shamuneko_pages_result
 {
 	char const *img_url;
+
+	char *img;
+	size_t img_size;
 };
+
+typedef void (*download_pages_callback_t)(struct shamuneko_pages_result *results,
+                                          size_t len,
+                                          void *data);
 
 typedef void (*get_trending_callback_t)(struct shamuneko_trending_result *results,
                                         size_t len,
