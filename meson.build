@@ -43,5 +43,8 @@ else
     cjson_dep = dependency('libcjson', required: true)
 endif
 
+miniz_subp = subproject('miniz')
+miniz_dep = miniz_subp.get_variable('miniz_dep')
+
 subdir('src')
 subdir('test/unit')

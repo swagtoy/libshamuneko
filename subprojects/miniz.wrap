@@ -1,0 +1,5 @@
+[wrap-file]
+directory = miniz-3.1.2
+source_url = https://github.com/richgel999/miniz/archive/refs/tags/3.1.2.zip
+source_filename = miniz-3.1.2.zip
+source_hash = e7a0334927a069dc5aeb69616d371542a4376e1569290d7102b88c6f3992d6cb
