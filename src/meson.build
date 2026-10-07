@@ -8,16 +8,19 @@ sources = files('''
     util.c
 '''.split())
 
-headers = []
+# public headers
+headers = files('''
+    shamuneko.h
+    shamuneko_module.h
+    shamuneko_types.h
+'''.split())
 amalg_includes = []
-foreach src : sources
-    header = src.full_path().replace('.c', '.h')
-    headers += header
 
-    # With these headers, we'll generate a big set of commands to
-    #  preprocess, that way we can exclude duplicate definitions (instead
-    #  of calling `cpp' on each file, foer example)
-    amalg_includes += [ '-include', header ]
+# With these headers, we'll generate a big set of commands to
+#  preprocess, that way we can exclude duplicate definitions (instead
+#  of calling `cpp' on each file, foer example)
+foreach header : headers
+    amalg_includes += [ '-include', header.full_path() ]
 endforeach
 
 message(amalg_includes)
@@ -44,4 +47,11 @@ configure_file(
     output: 'shamuneko_amalgamation_header.h',
     capture: true,
     command: [ 'echo', header_amalg ]
+)
+
+# one that can be included with luajit
+configure_file(
+    output: 'shamuneko_amalgamation_header.lua',
+    capture: true,
+    command: [ 'echo', 'return [[', header_amalg, ']]' ]
 )

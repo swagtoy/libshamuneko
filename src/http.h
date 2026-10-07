@@ -1,9 +1,7 @@
 #ifndef _HTTP_H_
 #define _HTTP_H_
 
-#ifndef SHAMUNEKO_AMALGAMATION_HEADER
-#	include <lua.h>
-#endif
+#include <lua.h>
 #include "shamuneko_private.h"
 
 SHAMUNEKO_PRIVATE int  luafunc_create_httpsession(lua_State *L);

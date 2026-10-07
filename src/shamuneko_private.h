@@ -1,13 +1,12 @@
 #ifndef _SHAMUNEKO_PRIVATE_H_
 #define _SHAMUNEKO_PRIVATE_H_
 
-#ifndef SHAMUNEKO_AMALGAMATION_HEADER
-#	include <stdint.h>
-#	include <assert.h>
-#	include <lua.h>
-#	include <lauxlib.h>
-#	include <lualib.h>
-#endif
+#include <stdint.h>
+#include <assert.h>
+#include <lua.h>
+#include <lauxlib.h>
+#include <lualib.h>
+
 #include "shamuneko_types.h"
 
 #if defined(__GNUC__) && !defined(SHAMUNEKO_AMALGAMATION_HEADER)
