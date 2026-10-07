@@ -114,9 +114,17 @@ _get_pages_cb(struct shamuneko_pages_result *pages, size_t len, void *data)
 
 
 int
-main()
+main(int argc, char *argv[])
 {
 	curl_global_init(CURL_GLOBAL_ALL);
+
+	int comic_idx = 0;
+	char *err = NULL;
+	if (argc > 1)
+	{
+		comic_idx = strtol(argv[1], &err, 10);
+		if (*argv[1] == '\0' || *err != '\0') comic_idx = 0;
+	}
 
 	/* NOTE: Since we use curl easy handles in our request functions,
 	 *  we MUST set SHAMUNEKO_FLAG_SYNCHRONOUS.
@@ -152,7 +160,7 @@ main()
 
 	//shamuneko_module_search(pepperandcarrot, "help");
 	shamuneko_module_get_trending(pepperandcarrot, _get_trending_cb, NULL);
-	shamuneko_module_get_pages(pepperandcarrot, "peppercarrot", 0, _get_pages_cb, state /* TODO: Not the case later */);
+	shamuneko_module_get_pages(pepperandcarrot, "peppercarrot", comic_idx, _get_pages_cb, state /* TODO: Not the case later */);
 
 	shamuneko_module_destroy(pepperandcarrot);
 #endif
