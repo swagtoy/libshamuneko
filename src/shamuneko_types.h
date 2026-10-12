@@ -7,7 +7,7 @@
 #endif
 
 typedef uint8_t shamuneko_flags_t;
-#define SHAMUNEKO_FLAG_SYNCHRONOUS (1<<2)
+#define SHAMUNEKO_FLAG_SYNCHRONOUS (1<<0)
 
 typedef struct _shamuneko_state shamuneko_state_t;
 struct _shamuneko_state;
